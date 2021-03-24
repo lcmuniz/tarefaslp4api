@@ -1,55 +1,128 @@
-let autores = [
-    {id: 1, nome: 'Luiz Carlos'},
-    {id: 2, nome: 'Maria Silva'},
-    {id: 3, nome: 'Sandra Rosa Madalena'}
-]
-let tarefas = [
-    {id: 1, texto: 'Minha primeira tarefa', autor_id: 1, completada: false},
-    {id: 2, texto: 'Minha segunda tarefa', autor_id: 1, completada: false},
-    {id: 3, texto: 'Minha terceira tarefa', autor_id: 2, completada: true},
-    {id: 4, texto: 'Minha quarta tarefa', autor_id: 2, completada: true},
-    {id: 5, texto: 'Minha quinta tarefa', autor_id: 3, completada: false}
-]
+const sqlite3 = require('sqlite3').verbose()
+
+const db = new sqlite3.Database('./db/db-tarefas', err => {
+    if (err) {
+        return console.error(err.message)
+    }
+    else {
+        console.log('Connected to the database.')
+    }
+})
+
+const dbAll = (...args) => {
+    return new Promise((resolve, reject) => {
+        db.all(...args, (err, data) => {
+            if (err) return reject(err)
+            resolve(data)
+        })
+    })
+}
+
+const dbRun = (...args) => {
+    return new Promise((resolve, reject) => {
+        db.run(...args, (err, data) => {
+            if (err) return reject(err)
+            resolve(data)
+        })
+    })
+}
+
+const dbGet = (...args) => {
+    return new Promise((resolve, reject) => {
+        db.get(...args, (err, data) => {
+            if (err) return reject(err)
+            resolve(data)
+        })
+    })
+}
+
+const findAllTarefas = async () => {
+    const sql = 'select * from tarefas order by texto'
+    const res = await dbAll(sql, [])
+    return res
+}
+
+const findTarefa = async (id) => {
+    const sql = 'select * from tarefas where id = ' + id
+    const res = await dbGet(sql, [])
+    return res
+}
+
+const findAllAutores = async () => {
+    const sql = 'select * from autores order by nome'
+    const res = await dbAll(sql, [])
+    return res
+}
+
+const findAutor = async (id) => {
+    const sql = 'select * from autores where id = ' + id
+    const res = await dbGet(sql, [])
+    return res
+}
 
 module.exports = {
     tarefas:  {
-        findAll: () => {
-            return tarefas.sort((a, b) => a.texto.localeCompare(b.texto))
+        findAll: async () => {
+            return await findAllTarefas()
         },
-        findById: (id) => {
-            return tarefas.filter(t => t.id == id)[0]
+        findById: async (id) => {
+            return await findTarefa(id)
         },
-        save: (tarefa) => {
-            if (tarefa.id == undefined) tarefa.id = tarefas.length + 1
-            const temp = tarefas.filter(t => t.id != tarefa.id)
-            tarefas = [...temp, tarefa]
-            return tarefas
+        save: async (tarefa) => {
+            if (tarefa.id == undefined) {
+                const sql = `insert into tarefas (texto, autor_id, completada) values ('${tarefa.texto}', '${tarefa.autor_id}', '${tarefa.completada}')`
+                await dbRun(sql)
+            }
+            else {
+                const tarefaBanco = await findAutor(tarefa.id)
+                if (tarefaBanco) {
+                    if(tarefa.texto) tarefaBanco.texto = tarefa.nome
+                    if(tarefa.autor_id) tarefaBanco.autor_id = tarefa.autor_id
+                    if(tarefa.completada) tarefaBanco.completada = tarefa.completada
+                    const sql = `update tarefas set texto = '${tarefaBanco.texto}', autor_id = '${tarefaBanco.autor_id}', completada = '${tarefaBanco.completada}' where id = ${tarefaBanco.id}`
+                    await dbRun(sql)
+                }
+            }
+            return await findAllTarefas()
         },
-        delete: (id) => {
-            tarefas  = tarefas.filter(t => t.id != id)        
-            return tarefas;
+        delete: async (id) => {
+            const sql = `delete from tarefas where id = ` + id
+            await dbRun(sql)
+            return await findAllTarefas()
         },
     },
     autores:  {
-        findAll: () => {
-            return autores.sort((a, b) => a.nome.localeCompare(b.nome))
+        findAll: async () => {
+            return await findAllAutores()
         },
-        findById: (id) => {
-            return autores.filter(a => a.id == id)[0]
+        findById: async (id) => {
+            return await findAutor(id)
         },
-        save: (autor) => {
-            if (autor.id == undefined) autor.id = autores.length + 1
-            const temp = autores.filter(a => a.id != autor.id)
-            console.log(temp)
-            autores = [...temp, autor]
-            return autores
+        save: async (autor) => {
+            if (autor.id == undefined) {
+                const sql = `insert into autores (nome, senha) values ('${autor.nome}', '${autor.senha}')`
+                await dbRun(sql)
+            }
+            else {
+                const autorBanco = await findAutor(autor.id)
+                if (autorBanco) {
+                    if(autor.nome) autorBanco.nome = autor.nome
+                    if(autor.senha) autorBanco.senha = autor.senha
+                    const sql = `update autores set nome = '${autorBanco.nome}', senha = '${autorBanco.senha}' where id = ${autorBanco.id}`
+                    await dbRun(sql)
+                }
+            }
+            return await findAllAutores()
         },
-        delete: (id) => {
-            autores  = autores.filter(a => a.id != id)        
-            return autores;
+        delete: async (id) => {
+            const sql = `delete from autores where id = ` + id
+            await dbRun(sql)
+            return await findAllAutores()
         },
-        findAllTarefasByAutorId: (id) => {
-            return tarefas.filter(t => t.autor_id == id)        
+        findAllTarefasByAutorId: async (id) => {
+            const sql = `select * from tarefas where autor_id = ${id} order by texto`
+            const res = await dbAll(sql, [])
+            return res
         }
     }
 }

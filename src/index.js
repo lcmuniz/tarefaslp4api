@@ -3,6 +3,8 @@ const db = require('./db')
 const tarefas = require('./tarefas')
 const autores = require('./autores')
 const cors = require('cors');
+const createSchema = require('./schema')
+
 
 const app = express()
 
@@ -12,6 +14,21 @@ app.use(cors({origin: '*'}));
 
 app.get('/', (req, res) => {
     res.send({version: 1.0})
+})
+
+app.post('/schema/create', async (req, res) => {
+    try {
+        const msg = await createSchema(false)
+        res.send(msg)
+    }
+    catch(err) {
+        res.status(400).send(err)   
+    }
+})
+
+app.post('/schema/recreate', async (req, res) => {
+    const msg = await createSchema(true)
+    res.send(msg)
 })
 
 app.use('/tarefas', tarefas)
