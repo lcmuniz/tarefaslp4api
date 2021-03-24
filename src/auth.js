@@ -7,14 +7,14 @@ const router = express.Router()
 
 //router.use((req, res, next) => next())
 
-router.get('/login', async (req, res) => {
+router.post('/login', async (req, res) => {
     const {email, senha} = req.body
     const autor = await db.autores.findBy(email, encryptPassword(senha))
     if(autor){
         //auth ok
         const id = autor.id; //esse id viria do banco de dados
         const token = jwt.sign({ id }, process.env.SECRET, {
-          expiresIn: 300 // expires in 5min
+          expiresIn: 600 // 300 = expires in 5min
         });
         delete autor.senha
         return res.json({ autor, auth: true, token: token });
