@@ -98,17 +98,23 @@ module.exports = {
         findById: async (id) => {
             return await findAutor(id)
         },
+        findBy: async (email, senha) => {
+            const sql = `select * from autores where email = '${email}' and senha = '${senha}'`
+            const res = await dbGet(sql, [])
+            return res
+        },
         save: async (autor) => {
             if (autor.id == undefined) {
-                const sql = `insert into autores (nome, senha) values ('${autor.nome}', '${autor.senha}')`
+                const sql = `insert into autores (nome, email, senha) values ('${autor.nome}', '${autor.email}', '${autor.senha}')`
                 await dbRun(sql)
             }
             else {
                 const autorBanco = await findAutor(autor.id)
                 if (autorBanco) {
                     if(autor.nome) autorBanco.nome = autor.nome
+                    if(autor.email) autorBanco.email = autor.email
                     if(autor.senha) autorBanco.senha = autor.senha
-                    const sql = `update autores set nome = '${autorBanco.nome}', senha = '${autorBanco.senha}' where id = ${autorBanco.id}`
+                    const sql = `update autores set nome = '${autorBanco.nome}', email = '${autorBanco.email}', senha = '${autorBanco.senha}' where id = ${autorBanco.id}`
                     await dbRun(sql)
                 }
             }

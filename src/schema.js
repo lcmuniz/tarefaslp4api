@@ -27,7 +27,7 @@ const createSchema = async (recriar) => {
         resp.msg_deleted  = 'Schema deleted.'
     }
 
-    await dbRun('create table autores (id integer primary key autoincrement, nome text, senha text)')
+    await dbRun('create table autores (id integer primary key autoincrement, nome text, email text, senha text)')
     await dbRun('create table tarefas (id integer primary key autoincrement, texto text, autor_id integer, completada text)')
     resp.msg_created  ='Schema created.'
     return resp
