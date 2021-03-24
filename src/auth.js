@@ -1,15 +1,15 @@
 const express = require('express')
 const jwt = require('jsonwebtoken');
 const db = require('./db')
-const {cryptoSenha} = require('./security')
+const {encryptPassword} = require('./security')
 
 const router = express.Router()
 
-router.use((req, res, next) => next())
+//router.use((req, res, next) => next())
 
 router.get('/login', async (req, res) => {
     const {email, senha} = req.body
-    const autor = await db.autores.findBy(email, cryptoSenha(senha))
+    const autor = await db.autores.findBy(email, encryptPassword(senha))
     if(autor){
         //auth ok
         const id = autor.id; //esse id viria do banco de dados

@@ -14,10 +14,10 @@ const verifyJWT = (req, res, next) => {
     });
 }
 
-const cryptoSenha = (senha) => {
+const encryptPassword = (senha) => {
   const hash = crypto.createHash('sha512')
   hash.update(senha);
   return hash.digest('hex');
 }
 
-module.exports = { verifyJWT, cryptoSenha }
+module.exports = { verifyJWT, encryptPassword }

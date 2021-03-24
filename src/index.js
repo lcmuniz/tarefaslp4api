@@ -37,10 +37,9 @@ app.post('/schema/recreate', verifyJWT, async (req, res) => {
 app.use('/tarefas', verifyJWT, tarefas)
 
 app.use('/autores', verifyJWT, autores)
-
+ 
 app.use('/auth', auth)
 
-
-app.listen(8888, () => {
-    console.log('Server listening on port 8888')
+app.listen(process.env.PORT, () => {
+    console.log(`Server listening on port ${process.env.PORT}`)
 })

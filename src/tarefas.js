@@ -2,7 +2,7 @@ const db = require('./db')
 const express = require('express')
 const router = express.Router()
 
-router.use((req, res, next) => next())
+//router.use((req, res, next) => next())
 
 router.get('/', async (req, res) => {
     return res.send(await db.tarefas.findAll())
