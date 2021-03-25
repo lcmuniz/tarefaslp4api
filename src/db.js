@@ -57,6 +57,7 @@ const findAllAutores = async () => {
 const findAutor = async (id) => {
     const sql = 'select * from autores where id = ' + id
     const res = await dbGet(sql, [])
+    console.log(res)
     return res
 }
 
@@ -74,9 +75,9 @@ module.exports = {
                 await dbRun(sql)
             }
             else {
-                const tarefaBanco = await findAutor(tarefa.id)
+                const tarefaBanco = await findTarefa(tarefa.id)
                 if (tarefaBanco) {
-                    if(tarefa.texto) tarefaBanco.texto = tarefa.nome
+                    if(tarefa.texto) tarefaBanco.texto = tarefa.texto
                     if(tarefa.autor_id) tarefaBanco.autor_id = tarefa.autor_id
                     if(tarefa.completada) tarefaBanco.completada = tarefa.completada
                     const sql = `update tarefas set texto = '${tarefaBanco.texto}', autor_id = '${tarefaBanco.autor_id}', completada = '${tarefaBanco.completada}' where id = ${tarefaBanco.id}`
