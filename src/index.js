@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
     res.send({version: 1.0})
 })
 
-app.post('/schema/create', verifyJWT, async (req, res) => {
+app.post('/schema/create', async (req, res) => {
     try {
         const msg = await createSchema(false)
         res.send(msg)
@@ -29,7 +29,7 @@ app.post('/schema/create', verifyJWT, async (req, res) => {
     }
 })
 
-app.post('/schema/recreate', verifyJWT, async (req, res) => {
+app.post('/schema/recreate', async (req, res) => {
     const msg = await createSchema(true)
     res.send(msg)
 })

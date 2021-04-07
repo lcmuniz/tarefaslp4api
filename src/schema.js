@@ -1,3 +1,4 @@
+const {encryptPassword} = require('./security')
 
 const createSchema = async (recriar) => {
     const sqlite3 = require('sqlite3').verbose()
@@ -29,6 +30,7 @@ const createSchema = async (recriar) => {
 
     await dbRun('create table autores (id integer primary key autoincrement, nome text, email text, senha text)')
     await dbRun('create table tarefas (id integer primary key autoincrement, texto text, autor_id integer, completada text)')
+    await dbRun(`insert into autores (nome, email, senha) values ('admin','admin@gmail.com','${encryptPassword('admin')}')`)
     resp.msg_created  ='Schema created.'
     return resp
 }
